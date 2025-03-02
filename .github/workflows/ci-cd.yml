@@ -1,33 +1,34 @@
 name: CI/CD for DateTimeChecker
-
+# Khi nào pipeline chạy
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest  # Máy ảo chạy pipeline
 
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
+      # 1. Checkout mã nguồn
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK 23
+      # 2. Cài đặt Java (phiên bản phù hợp với dự án của bạn)
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
-          java-version: '23'
+          java-version: '23'  # Thay đổi nếu bạn dùng phiên bản khác
+          distribution: 'adopt'
 
-      - name: Build and test with Maven
-        run: mvn clean verify
+      # 3. Cài đặt dependencies và chạy test
+      - name: Build and Test with Maven
+        run: mvn clean test
 
-      - name: Upload test results
-        if: failure()
-        uses: actions/upload-artifact@v4
+      # 4. (Tùy chọn) Báo cáo kết quả test
+      - name: Upload Test Results
+        if: always()  # Chạy kể cả khi test fail
+        uses: actions/checkout@v4
         with:
           name: test-results
           path: target/surefire-reports/
